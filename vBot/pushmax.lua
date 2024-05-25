@@ -32,7 +32,8 @@ if not storage[panelName] then
     pushDelay = 1060,
     pushMaxRuneId = 3188,
     mwallBlockId = 2128,
-    pushMaxKey = "PageUp"
+    pushMaxKey = "PageUp",
+    useDesintegrate = false
   }
 end
 
@@ -54,6 +55,31 @@ rootWidget = g_ui.getRootWidget()
 if rootWidget then
   pushWindow = UI.createWindow('PushMaxWindow', rootWidget)
   pushWindow:hide()
+
+  local updateDesintegrate = function()
+    if config.useDesintegrate then
+      config.useDesintegrate = true
+      pushWindow.buttonDesintegrate:setColor("#00cc00")
+      pushWindow.buttonDesintegrate:setText("Desintegrate target: ON")
+    else
+      config.useDesintegrate = false
+      pushWindow.buttonDesintegrate:setColor("#ff6666")
+      pushWindow.buttonDesintegrate:setText("Desintegrate target: OFF")
+    end
+  end
+
+  updateDesintegrate()
+  pushWindow.buttonDesintegrate.onClick = function(widget)
+    if config.useDesintegrate then
+      config.useDesintegrate = false
+      pushWindow.buttonDesintegrate:setColor("#ff6666")
+      pushWindow.buttonDesintegrate:setText("Desintegrate target: OFF")
+    else
+      config.useDesintegrate = true
+      pushWindow.buttonDesintegrate:setColor("#00cc00")
+      pushWindow.buttonDesintegrate:setText("Desintegrate target: ON")
+    end
+  end
 
   pushWindow.closeButton.onClick = function(widget)
     pushWindow:hide()
@@ -87,6 +113,7 @@ end
 
 -- variables for config
 local fieldTable = {2118, 105, 2122}
+local desintegrateTable = {2985, 2984, 2983, 2982, 2981}
 local cleanTile = nil
 
 -- scripts 
@@ -277,6 +304,13 @@ macro(50, function()
     if isNotOk(fieldTable, targetTile) then
       if targetTile:canShoot() then
         return useWith(3148, targetTile:getTopUseThing())
+      else
+        return
+      end
+    end
+    if config.useDesintegrate and isNotOk(desintegrateTable, targetTile) then
+      if targetTile:canShoot() then
+        return useWith(3197, targetTile:getTopUseThing())
       else
         return
       end
